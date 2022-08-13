@@ -1,0 +1,96 @@
+RETRIEVING THE PRODUCT DETAILS USING THE  PRODUCT ID
+        HTML:
+
+        <!DOCTYPE html> 
+	<html> 
+	<head> 
+	<meta charset="ISO-8859-1"> 
+	<title>Insert title here</title> 
+	</head> 
+	<body> 
+	<h1>Enter Product Id to get the Product details</h1> 
+	<form action="RetrieveProduct" method=get> 
+	<label>Enter product Id</label> 
+	<input type="text" name="id"> 
+	<input type="submit" value="submit"> 
+	</form> 
+	</body> 
+        </html>
+
+Program:
+
+package Retrieve;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/RetrieveProduct")
+public class RetrieveProduct extends HttpServlet {
+	// JDBC URL, username and password of MySQL server
+    private static final String url = "jdbc:mysql://localhost:3306/db_world";
+    private static final String user = "root";
+    private static final String password = "root";
+    
+    Connection con;
+    PreparedStatement prSt;
+    Statement stmt;
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		PrintWriter out=response.getWriter();
+		String Id=request.getParameter("id");
+		String query = "select Id,Name,Price from product where Id=?";
+		try
+		{
+			Class.forName("com.mysql.jdbc.Driver");
+			 con = DriverManager.getConnection(url, user, password);
+			 prSt = con.prepareStatement(query);
+			prSt.setString(1, Id);
+			ResultSet rs=prSt.executeQuery();
+			if(rs.next())
+			{
+				out.println(" Product Id is :"+ rs.getInt(1));
+				out.println("Product Name :"+ rs.getString(2));
+				out.println("Price is : "+ rs.getInt(3));
+			}
+			else
+			{
+				out.println("There is no Product with Product id "+Id);
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
+Web.xml:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>Assignment2</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+</web-app>
+
+
+
+
